@@ -102,7 +102,7 @@ void main(string[] args)
             Id <- [a-zA-Z_] [a-zA-Z_0-9]*
             Vartype <- ("%" / "#" / "!" / "$" / eps)
             Subscript <- "[" Expression (:WS? "," :WS? Expression)? "]"
-            Logop < "and" | "or"
+            Logop < "and"i | "or"i
             Relop < "<" | "<=" | "=" | "<>" | ">" | ">="
             String < doublequote (!doublequote . / ^' ')* doublequote
 
