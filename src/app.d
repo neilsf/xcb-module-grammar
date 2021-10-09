@@ -13,17 +13,19 @@ void main(string[] args)
     s ~= grammar(`
         XCBASIC:
             Program <- Line (NL+ Line)* EOI
-            Line <- :WS? Line_id :WS? Statements?
+            Line < :WS? Line_id :WS? Statements?
+            
             Statements < Statement :WS? (":" :WS? Statement :WS?)*
 
             Statement < Const_stmt / Let_stmt / Print_stmt / If_stmt / Goto_stmt / Input_stmt / Gosub_stmt / Call_stmt /
                         Rem_stmt / Poke_stmt / For_stmt / Next_stmt / Dim_stmt / Charat_stmt / Data_stmt / Textat_stmt / Incbin_stmt /
-                        Include_stmt / Sys_stmt / Load_stmt / Save_stmt /
-                        Origin_stmt / Asm_stmt / Swap_stmt / Curpos_stmt / On_stmt / Wait_stmt / Watch_stmt /
-                        Pragma_stmt / Memset_stmt / Memcpy_stmt / Memshift_stmt / 
+                        Include_stmt / Sys_stmt / Load_stmt / Save_stmt / Randomize_stmt /
+                        Origin_stmt / Swap_stmt / Locate_stmt / On_stmt / Error_stmt / Wait_stmt / Watch_stmt /
+                        Pragma_stmt / Memset_stmt / Memcpy_stmt / Memshift_stmt / Open_stmt / Close_stmt / Get_stmt /
                         If_sa_stmt / Else_stmt / Endif_stmt / Disableirq_stmt / Enableirq_stmt /
                         Fun_stmt / Endfun_stmt / Return_fn_stmt / Return_stmt / Exitfun_stmt / Do_stmt / Loop_stmt /
-                        Cont_stmt /  Exit_do_stmt / Type_stmt / Field_def / Endtype_stmt / End_stmt / Userdef_cmd
+                        Asm_stmt / Endasm_stmt /
+                        Cont_stmt /  Exit_do_stmt / Type_stmt / Field_def / Endtype_stmt / End_stmt
             Const_stmt <    ("shared"i :WS)? "const"i :WS? Var :WS? "=" :WS? Number
             Let_stmt <      ("let"i / eps) :WS? Accessor :WS? "=" :WS? Expression
             Print_stmt <    "print"i :WS? PrintableList :WS? ";"?
@@ -32,8 +34,9 @@ void main(string[] args)
             Else_stmt <     "else"i
             Endif_stmt <    "end if"i
             Goto_stmt <     "goto"i :WS (Label_ref / Unsigned)
+            Error_stmt <    "error"i :WS Expression
             Swap_stmt <     "swap"i :WS Accessor :WS? "," :WS? Accessor
-            Input_stmt <    "input"i :WS (String :WS? "," / ";" )? :WS? Accessor :WS? ";"?
+            Input_stmt <    "input"i :WS (("#" :WS? Expression :WS? ",")  / (String :WS? ";"))? :WS? Accessor :WS? ";"?
             Gosub_stmt <    "gosub"i :WS (Label_ref / Unsigned)
             Call_stmt <     "call"i :WS Accessor
             Return_stmt <   "return"i
@@ -43,7 +46,7 @@ void main(string[] args)
             Loop_stmt <     "loop"i (:WS ("while"i / "until"i) :WS Expression)?
             Cont_stmt <     "continue"i :WS ("for"i / "do"i)?
             Exit_do_stmt <  "exit do"i
-            Rem_stmt <      ("'" / "rem"i) (!eol .)*
+            Rem_stmt <      ("'" / "rem"i) ~((!eol .)*)
             For_stmt <      "for"i :WS? Varnosubscript :WS? "=" :WS? Expression :WS? "to"i :WS? Expression (:WS? "step"i :WS? Expression)?
             Next_stmt <     "next"i :WS Varname?
             Exit_for_stmt < "exit for"i
@@ -52,7 +55,8 @@ void main(string[] args)
             Data_stmt <     ("shared"i :WS)? "data"i :WS? Vartype :WS? Datalist
             Charat_stmt <   "charat"i :WS? Expression :WS? "," :WS? Expression :WS? "," :WS? Expression
             Textat_stmt <   "textat"i :WS? Expression :WS? "," :WS? Expression :WS? "," :WS? (String / Expression)
-            Asm_stmt <      "asm"i :WS? String
+            Asm_stmt <      "asm"i
+            Endasm_stmt <   "end asm"i
             Incbin_stmt <   "incbin"i :WS? String
             Include_stmt <  "include"i :WS? String
             Exitfun_stmt <  "exit function"i  / "exit sub"i
@@ -60,11 +64,12 @@ void main(string[] args)
             Fun_stmt <      ("declare"i :WS)? ("function"i / "sub"i) :WS Varnosubscript :WS? :"(" :WS? VarList? :WS? :")" (:WS Funcattrib)*
                 Funcattrib < "private"i / "shared"i / "static"i / "override"i / "inline"i
             Sys_stmt <      "sys"i :WS? Expression
-            Load_stmt <     "load"i :WS? String :WS? "," :WS? Expression (:WS? "," :WS? Expression)?
-            Save_stmt <     "save"i :WS? String :WS? "," :WS? Expression :WS? "," :WS? Expression :WS? "," :WS? Expression
+            Load_stmt <     "load"i :WS? ExprList
+            Save_stmt <     "save"i :WS? ExprList
             Origin_stmt <   "origin"i :WS? Number
-            Curpos_stmt <   "curpos"i :WS? Expression :WS? "," :WS? Expression
-            On_stmt <       "on"i :WS? Expression :WS? Branch_type :WS? Label_ref (:WS? "," :WS? Label_ref)*
+            Locate_stmt <   "locate"i :WS? Expression :WS? "," :WS? Expression
+            On_stmt <       "on"i :WS? (Expression / "error"i) :WS? Branch_type :WS? Label_ref (:WS? "," :WS? Label_ref)*
+                Branch_type < "goto"i / "gosub"i
             Wait_stmt <     "wait"i :WS? Expression :WS? "," :WS? Expression (:WS? "," :WS? Expression)?
             Watch_stmt <    "watch"i :WS? Expression :WS? "," :WS? Expression
             Pragma_stmt <   "pragma"i :WS? Id :WS? "=" :WS? Number
@@ -73,13 +78,15 @@ void main(string[] args)
             Memshift_stmt < "memshift"i :WS? Expression :WS? "," :WS? Expression :WS? "," :WS? Expression
             Disableirq_stmt < "disableirq"i
             Enableirq_stmt <  "enableirq"i
+            Randomize_stmt <  "randomize"i :WS Expression
+            Open_stmt < "open"i :WS ExprList
+            Get_stmt < "get"i (:WS? "#" :WS? Expression :WS? ",")? :WS? Var
+            Close_stmt < "close"i :WS Expression
             Type_stmt < "type"i :WS Id
             Field_def < Var
             Endtype_stmt < "end type"i
             End_stmt <      "end"i
-            Userdef_cmd <   Label_ref :WS? ExprList?
 
-            Branch_type < "goto"i / "gosub"i
             ExprList < Expression :WS? ("," :WS? Expression)*
             PrintableList < Expression :WS? (:WS? (TabSep / NlSupp) :WS? Expression)* NlSupp?
             TabSep < ","
@@ -132,11 +139,11 @@ void main(string[] args)
             Line_id < (Label / Unsigned / eps)
 
             Reserved < ("const"i / "let"i / "print"i / "if"i / "then"i / "goto"i / "input"i / "gosub"i / "return"i / "call"i /
-                         "end"i / "rem"i / "poke"i / "peek"i / "for"i / "to"i / "next"i / "dim"i / "data"i / "charat"i / "textat"i /
-                         "inkey"i / "rnd"i / "incbin"i /  "sys"i / "usr"i / "and"i / "origin"i /
-                          "or"i / "load"i / "save"i / "ferr"i / "deek"i / "doke"i / "sub"i / "function"i /
-                         "cast"i / "asm"i / "curpos"i / "wait"i / "watch"i / "pragma"i / "memset"i / "memcpy"i / "memshift"i /
-                         "while"i / "endwhile"i / "repeat"i / "until"i / "lshift"i / "rshift"i / "disableirq"i / "enableirq"i / "fun"i / "step"i)
+                         "end"i / "rem"i / "for"i / "to"i / "next"i / "dim"i / "data"i / "charat"i / "textat"i /
+                         "incbin"i /  "sys"i / "and"i / "origin"i / "or"i / "load"i / "save"i / "ferr"i / "sub"i / "function"i /
+                         "asm"i / "endasm"i / "locate"i / "wait"i / "watch"i / "pragma"i / "memset"i / "memcpy"i / "memshift"i /
+                         "while"i / "endwhile"i / "repeat"i / "until"i / "lshift"i / "rshift"i / "disableirq"i / "enableirq"i / "step"i
+                         / "randomize"i / "open"i / "close"i / "get"i / "error"i)
             WS < (space / "~" ('\r' / '\n' / '\r\n')+ )*
             EOI < !.
 
