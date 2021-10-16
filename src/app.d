@@ -24,11 +24,12 @@ void main(string[] args)
                         Pragma_stmt / Memset_stmt / Memcpy_stmt / Memshift_stmt / Open_stmt / Close_stmt / Get_stmt /
                         If_sa_stmt / Else_stmt / Endif_stmt / Disableirq_stmt / Enableirq_stmt /
                         Fun_stmt / Endfun_stmt / Return_fn_stmt / Return_stmt / Exitfun_stmt / Do_stmt / Loop_stmt /
-                        Asm_stmt / Endasm_stmt /
+                        Asm_stmt / Endasm_stmt / Print_hash_stmt /
                         Cont_stmt /  Exit_do_stmt / Type_stmt / Field_def / Endtype_stmt / End_stmt
             Const_stmt <    ("shared"i :WS)? "const"i :WS? Var :WS? "=" :WS? Number
             Let_stmt <      ("let"i / eps) :WS? Accessor :WS? "=" :WS? Expression
             Print_stmt <    "print"i :WS? PrintableList :WS? ";"?
+            Print_hash_stmt < "print"i :WS? "#" :WS? ExprList :WS? ";"?
             If_stmt <       "if"i :WS Expression :WS "then"i :WS Statements :WS ("else"i :WS Statements)?
             If_sa_stmt <    "if"i :WS Expression :WS "then"i
             Else_stmt <     "else"i
@@ -63,7 +64,7 @@ void main(string[] args)
             Endfun_stmt <   "end function"i / "end sub"i
             Fun_stmt <      ("declare"i :WS)? ("function"i / "sub"i) :WS Varnosubscript :WS? :"(" :WS? VarList? :WS? :")" (:WS Funcattrib)*
                 Funcattrib < "private"i / "shared"i / "static"i / "override"i / "inline"i
-            Sys_stmt <      "sys"i :WS? Expression
+            Sys_stmt <      "sys"i :WS? Expression (:WS? "fast"i)?
             Load_stmt <     "load"i :WS? ExprList
             Save_stmt <     "save"i :WS? ExprList
             Origin_stmt <   "origin"i :WS? Number
@@ -73,9 +74,9 @@ void main(string[] args)
             Wait_stmt <     "wait"i :WS? Expression :WS? "," :WS? Expression (:WS? "," :WS? Expression)?
             Watch_stmt <    "watch"i :WS? Expression :WS? "," :WS? Expression
             Pragma_stmt <   "pragma"i :WS? Id :WS? "=" :WS? Number
-            Memset_stmt <   "memset"i :WS? Expression :WS? "," :WS? Expression :WS? "," :WS? Expression
-            Memcpy_stmt <   "memcpy"i :WS? Expression :WS? "," :WS? Expression :WS? "," :WS? Expression
-            Memshift_stmt < "memshift"i :WS? Expression :WS? "," :WS? Expression :WS? "," :WS? Expression
+            Memset_stmt <   "memset"i :WS? ExprList
+            Memcpy_stmt <   "memcpy"i :WS? ExprList
+            Memshift_stmt < "memshift"i :WS? ExprList
             Disableirq_stmt < "disableirq"i
             Enableirq_stmt <  "enableirq"i
             Randomize_stmt <  "randomize"i :WS Expression
@@ -101,7 +102,7 @@ void main(string[] args)
             Factor < (UN_OP? :WS? Accessor) / Number / (UN_OP? :WS? Parenthesis) / String / (UN_OP? :WS? Expression) / (UN_OP? :WS? Address)
             
             UN_OP < ("-" / ("not"i :WS))
-            T_OP < ("*" / "/")
+            T_OP < ("*" / "/" / "mod"i)
             E_OP < ("+" / "-")
             BW_OP < ("and"i / "or"i / "xor"i)
             REL_OP < "<" | "<=" | "=" | "<>" | ">" | ">="
@@ -142,8 +143,8 @@ void main(string[] args)
                          "end"i / "rem"i / "for"i / "to"i / "next"i / "dim"i / "data"i / "charat"i / "textat"i /
                          "incbin"i /  "sys"i / "and"i / "origin"i / "or"i / "load"i / "save"i / "ferr"i / "sub"i / "function"i /
                          "asm"i / "endasm"i / "locate"i / "wait"i / "watch"i / "pragma"i / "memset"i / "memcpy"i / "memshift"i /
-                         "while"i / "endwhile"i / "repeat"i / "until"i / "lshift"i / "rshift"i / "disableirq"i / "enableirq"i / "step"i
-                         / "randomize"i / "open"i / "close"i / "get"i / "error"i)
+                         "while"i / "endwhile"i / "repeat"i / "until"i / "disableirq"i / "enableirq"i / "step"i
+                         / "randomize"i / "open"i / "close"i / "get"i / "error"i / "mod"i)
             WS < (space / "~" ('\r' / '\n' / '\r\n')+ )*
             EOI < !.
 
