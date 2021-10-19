@@ -63,7 +63,7 @@ void main(string[] args)
             Exitfun_stmt <  "exit function"i  / "exit sub"i
             Endfun_stmt <   "end function"i / "end sub"i
             Fun_stmt <      ("declare"i :WS)? ("function"i / "sub"i) :WS Varnosubscript :WS? :"(" :WS? VarList? :WS? :")" (:WS Funcattrib)*
-                Funcattrib < "private"i / "shared"i / "static"i / "override"i / "inline"i
+                Funcattrib < "private"i / "shared"i / "static"i / "overload"i / "inline"i
             Sys_stmt <      "sys"i :WS? Expression (:WS? "fast"i)?
             Load_stmt <     "load"i :WS? ExprList
             Save_stmt <     "save"i :WS? ExprList
