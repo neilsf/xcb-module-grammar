@@ -13,6 +13,7 @@
 
 # Executables
 *.exe
+xcb-module-grammar
 
 # DUB
 .dub
