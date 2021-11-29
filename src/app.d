@@ -12,7 +12,7 @@ void main(string[] args)
     string s = "module language.grammar;\n\nimport pegged.grammar;\n\n";
     s ~= grammar(`
         XCBASIC:
-            Program <- Line (NL+ Line)* EOI
+            Program <- Line (endOfLine+ Line)* EOI
             Line < :WS? Line_id :WS? Statements?
             
             Statements < Statement :WS? (":" :WS? Statement :WS?)*
@@ -154,8 +154,6 @@ void main(string[] args)
                          "screen"i / "cls"i)
             WS < (space / "~" ('\r' / '\n' / '\r\n')+ )*
             EOI < !.
-
-            NL <- !"~" ('\r' / '\n' / '\r\n')+
             Spacing <- :('\t')*
         `);
     writeln(s);
