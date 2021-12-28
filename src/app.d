@@ -24,13 +24,12 @@ void main(string[] args)
                         Pragma_stmt / Memset_stmt / Memcpy_stmt / Memshift_stmt / Open_stmt / Close_stmt / Get_stmt /
                         If_sa_stmt / Else_stmt / Endif_stmt / Disableirq_stmt / Enableirq_stmt /
                         Fun_stmt / Endfun_stmt / Return_fn_stmt / Return_stmt / Exitfun_stmt / Do_stmt / Loop_stmt /
-                        Asm_stmt / Endasm_stmt / Print_hash_stmt / Write_stmt / Read_stmt /
+                        Asm_stmt / Endasm_stmt / Write_stmt / Read_stmt /
                         Cont_stmt /  Exit_do_stmt / Exit_for_stmt / Type_stmt / Field_def / Endtype_stmt / End_stmt /
                         Screen_stmt / Cls_stmt
             Const_stmt <    ("shared"i :WS)? "const"i :WS? Var :WS? "=" :WS? Number
             Let_stmt <      ("let"i / eps) :WS? Accessor :WS? "=" :WS? Expression
-            Print_stmt <    "print"i :WS? PrintableList :WS? ";"?
-            Print_hash_stmt < "print"i :WS? "#" :WS? ExprList :WS? ";"?
+            Print_stmt <    "print"i :WS? ("#" :WS? Expression :WS? ",")? :WS? PrintableList
             Write_stmt      < "write"i :WS? "#" :WS? ExprList
             Read_stmt       < "read"i :WS? "#" :WS? Expression  :WS? "," :WS? AccessorList
             If_stmt <       "if"i :WS Expression :WS "then"i :WS Statements :WS ("else"i :WS Statements)?
@@ -40,7 +39,7 @@ void main(string[] args)
             Goto_stmt <     "goto"i :WS (Label_ref / Unsigned)
             Error_stmt <    "error"i :WS Expression
             Swap_stmt <     "swap"i :WS Accessor :WS? "," :WS? Accessor
-            Input_stmt <    "input"i :WS (("#" :WS? Expression :WS? ",")  / (String :WS? ";"))? :WS? Accessor :WS? ";"?
+            Input_stmt <    "input"i :WS (("#" :WS? Expression :WS? ",")  / (String :WS? ";"))? :WS? AccessorList :WS? ";"?
             Gosub_stmt <    "gosub"i :WS (Label_ref / Unsigned)
             Call_stmt <     "call"i :WS Accessor
             Return_stmt <   "return"i
