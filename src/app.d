@@ -54,8 +54,9 @@ void main(string[] args)
             For_stmt <      "for"i :WS Varnosubscript :WS? "=" :WS? Expression :WS? "to"i :WS? Expression (:WS? "step"i :WS? Expression)?
             Next_stmt <     "next"i :WS Varname?
             Exit_for_stmt < "exit for"i
-            Dim_stmt <      ("dim"i / "static"i) :WS (Varattrib :WS)* Var (:WS? :"@" :WS? (Number / Label_ref))? (:WS? Varattrib :WS)*
+            Dim_stmt <      ("dim"i / "static"i) :WS (Varattrib :WS)* Vardef (:WS? "," :WS? Vardef)* (:WS? Varattrib :WS)*
                 Varattrib < "fast"i / "shared"i
+                Vardef < Var (:WS? :"@" :WS? (Number / Label_ref))?
             Data_stmt <     ("shared"i :WS)? "data"i :WS Vartype :WS? Datalist
             Charat_stmt <   "charat"i :WS ExprList
             Textat_stmt <   "textat"i :WS ExprList
