@@ -21,12 +21,12 @@ void main(string[] args)
                         Rem_stmt / Poke_stmt / For_stmt / Next_stmt / Dim_stmt / Charat_stmt / Data_stmt / Textat_stmt / Incbin_stmt /
                         Include_stmt / Sys_stmt / Load_stmt / Save_stmt / Randomize_stmt /
                         Origin_stmt / Swap_stmt / Locate_stmt / On_stmt / Error_stmt / Wait_stmt / Watch_stmt /
-                        Pragma_stmt / Memset_stmt / Memcpy_stmt / Memshift_stmt / Open_stmt / Close_stmt / Get_stmt /
+                         Memset_stmt / Memcpy_stmt / Memshift_stmt / Open_stmt / Close_stmt / Get_stmt /
                         If_sa_stmt / Else_stmt / Endif_stmt / Disableirq_stmt / Enableirq_stmt /
                         Fun_stmt / Endfun_stmt / Return_fn_stmt / Return_stmt / Exitfun_stmt / Do_stmt / Loop_stmt /
                         Asm_stmt / Endasm_stmt / Print_hash_stmt / Write_stmt / Read_stmt /
                         Cont_stmt /  Exit_do_stmt / Exit_for_stmt / Type_stmt / Field_def / Endtype_stmt / End_stmt /
-                        Screen_stmt / Cls_stmt
+                        Screen_stmt / Cls_stmt / Option_stmt
             Const_stmt <    ("shared"i :WS)? "const"i :WS? Var :WS? "=" :WS? Number
             Let_stmt <      ("let"i / eps) :WS? Accessor :WS? "=" :WS? Expression
             Print_stmt <    "print"i :WS? PrintableList :WS? ";"?
@@ -79,7 +79,6 @@ void main(string[] args)
                 Branch_type < "goto"i / "gosub"i
             Wait_stmt <     "wait"i :WS? Expression :WS? "," :WS? Expression (:WS? "," :WS? Expression)?
             Watch_stmt <    "watch"i :WS? Expression :WS? "," :WS? Expression
-            Pragma_stmt <   "pragma"i :WS? Id :WS? "=" :WS? Number
             Memset_stmt <   "memset"i :WS? ExprList
             Memcpy_stmt <   "memcpy"i :WS? ExprList
             Memshift_stmt < "memshift"i :WS? ExprList
@@ -93,6 +92,7 @@ void main(string[] args)
             Field_def < Var
             Endtype_stmt < "end type"i
             End_stmt <      "end"i
+            Option_stmt <   "option"i :WS Id (:WS? "=" :WS? (Number / String))?
 
             ExprList < Expression :WS? ("," :WS? Expression)*
             AccessorList < Accessor :WS? ("," :WS? Accessor)*
@@ -149,10 +149,10 @@ void main(string[] args)
             Reserved < ("const"i / "let"i / "print"i / "if"i / "then"i / "goto"i / "input"i / "gosub"i / "return"i / "call"i /
                          "end"i / "rem"i / "for"i / "to"i / "next"i / "dim"i / "data"i / "charat"i / "textat"i /
                          "incbin"i /  "sys"i / "and"i / "origin"i / "or"i / "load"i / "save"i / "ferr"i / "sub"i / "function"i /
-                         "asm"i / "endasm"i / "locate"i / "wait"i / "watch"i / "pragma"i / "memset"i / "memcpy"i / "memshift"i /
+                         "asm"i / "endasm"i / "locate"i / "wait"i / "watch"i / "memset"i / "memcpy"i / "memshift"i /
                          "while"i / "endwhile"i / "repeat"i / "until"i / "disableirq"i / "enableirq"i / "step"i
                          / "randomize"i / "open"i / "close"i / "get"i / "error"i / "mod"i / "read"i / "write"i /
-                         "screen"i / "cls"i)
+                         "screen"i / "cls"i / "option"i)
             WS < (space / "~" ('\r' / '\n' / '\r\n')+ )*
             EOI < !.
 
