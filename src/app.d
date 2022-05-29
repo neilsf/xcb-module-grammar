@@ -26,7 +26,8 @@ void main(string[] args)
                         Fun_stmt / Endfun_stmt / Return_fn_stmt / Return_stmt / Exitfun_stmt / Do_stmt / Loop_stmt /
                         Asm_stmt / Endasm_stmt / Print_hash_stmt / Write_stmt / Read_stmt /
                         Cont_stmt /  Exit_do_stmt / Exit_for_stmt / Type_stmt / Field_def / Endtype_stmt / End_stmt /
-                        Screen_stmt / Cls_stmt
+                        Screen_stmt / Cls_stmt / Sprite_clearhit_stmt / Sprite_multicolor_stmt / Sprite_stmt /
+                        Sound_clear_stmt / Volume_stmt / Voice_stmt / Filter_stmt
             Const_stmt <    ("shared"i :WS)? "const"i :WS? Var :WS? "=" :WS? Number
             Let_stmt <      ("let"i / eps) :WS? Accessor :WS? "=" :WS? Expression
             Print_stmt <    "print"i :WS? PrintableList :WS? ";"?
@@ -74,7 +75,7 @@ void main(string[] args)
             Save_stmt <     "save"i :WS ExprList
             Origin_stmt <   "origin"i :WS Number
             Locate_stmt <   "locate"i :WS Expression :WS? "," :WS? Expression
-            On_stmt <       "on"i :WS (Expression / "error"i) :WS? Branch_type :WS? Label_ref (:WS? "," :WS? Label_ref)*
+            On_stmt <       "on"i :WS (Expression / "error"i / "interrput"i) :WS? Branch_type :WS? Label_ref (:WS? "," :WS? Label_ref)*
                 Branch_type < "goto"i / "gosub"i
             Wait_stmt <     "wait"i :WS? Expression :WS? "," :WS? Expression (:WS? "," :WS? Expression)?
             Watch_stmt <    "watch"i :WS? Expression :WS? "," :WS? Expression
@@ -91,8 +92,42 @@ void main(string[] args)
             Type_stmt < "type"i :WS Id
             Field_def < Var
             Endtype_stmt < "end type"i
+            Endinterrupt_stmt < "end interrupt"i
             End_stmt <      "end"i
-
+            
+            Sprite_stmt <   "sprite"i :WS Expression (:WS SprSubCmd)*
+                SprSubCmd <  SprSubCmdOnOff / SprSubCmdAt / SprSubCmdColor /
+                             SprSubCmdHiresMulti / SprSubCmdOnUnderBg /
+                             SprSubCmdShape / SprSubCmdXYSize
+                    SprSubCmdOnOff < "on"i / "off"i
+                    SprSubCmdAt < "at"i :WS ExprList
+                    SprSubCmdColor < "color"i :WS Expression
+                    SprSubCmdHiresMulti < "hires"i / "multi"i
+                    SprSubCmdOnUnderBg < ("on"i | "under"i) :WS "background"i
+                    SprSubCmdShape < "shape"i :WS Expression
+                    SprSubCmdXYSize < "xysize"i :WS ExprList
+            Sprite_clearhit_stmt < "sprite"i :WS "clear"i :WS "hit"i
+            Sprite_multicolor_stmt < "sprite"i :WS "multicolor"i :WS ExprList
+            
+            Sound_clear_stmt < "sound"i :WS "clear"i
+            Volume_stmt < "volume"i :WS Expression
+            Voice_stmt < "voice"i :WS Expression (:WS VoiceSubCmd)*
+                VoiceSubCmd < VoiceSubCmdOnOff / VoiceSubCmdADSR /
+                              VoiceSubCmdTone / VoiceSubCmdWave / VoiceSubCmdPulse /
+                              VoiceSubCmdFilterOnOff
+                    VoiceSubCmdOnOff < "on"i / "off"i
+                    VoiceSubCmdADSR < "adsr"i :WS ExprList
+                    VoiceSubCmdTone < "tone"i :WS Expression
+                    VoiceSubCmdWave < "wave"i :WS ("saw"i / "tri"i / "pulse"i / "noise"i )
+                    VoiceSubCmdPulse < "pulse"i :WS Expression
+                    VoiceSubCmdFilterOnOff < "filter"i :WS ("on"i / "off"i)
+            Filter_stmt < "filter" (:WS FilterSubCmd)*
+                FilterSubCmd < FilterSubCmdCutoff / FilterSubCmdResonnance /
+                                FilterSubCmdPass
+                    FilterSubCmdCutoff < "cutoff"i :WS Expression
+                    FilterSubCmdResonnance < "resonnance"i :WS Expression
+                    FilterSubCmdPass < ("low"i / "band"i / "high"i) :WS "pass"i
+           
             ExprList < Expression :WS? ("," :WS? Expression)*
             AccessorList < Accessor :WS? ("," :WS? Accessor)*
             PrintableList < Expression :WS? (:WS? (TabSep / NlSupp) :WS? Expression)* NlSupp?
@@ -147,11 +182,12 @@ void main(string[] args)
 
             Reserved < ("const"i / "let"i / "print"i / "if"i / "then"i / "goto"i / "input"i / "gosub"i / "return"i / "call"i /
                          "end"i / "rem"i / "for"i / "to"i / "next"i / "dim"i / "data"i / "charat"i / "textat"i /
-                         "incbin"i /  "sys"i / "and"i / "origin"i / "or"i / "load"i / "save"i / "ferr"i / "sub"i / "function"i /
-                         "asm"i / "endasm"i / "locate"i / "wait"i / "watch"i / "pragma"i / "memset"i / "memcpy"i / "memshift"i /
-                         "while"i / "endwhile"i / "repeat"i / "until"i / "disableirq"i / "enableirq"i / "step"i
+                         "incbin"i / "sys"i / "and"i / "origin"i / "or"i / "load"i / "save"i / "ferr"i / "sub"i / "function"i /
+                         "asm"i / "endasm"i / "locate"i / "wait"i / "memset"i / "memcpy"i / "memshift"i /
+                         "while"i / "repeat"i / "until"i / "disableirq"i / "enableirq"i / "step"i
                          / "randomize"i / "open"i / "close"i / "get"i / "error"i / "mod"i / "read"i / "write"i /
-                         "screen"i / "cls"i)
+                         "screen"i / "cls"i / "sprite"i / "off"i / "at"i / "color"i / "xysize"i / "shape"i / "hires"i /
+                         "multi"i / "multicolor"i / "clear"i / "hit"i)
             WS < (space / "~" ('\r' / '\n' / '\r\n')+ )*
             EOI < !.
 
