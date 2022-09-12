@@ -17,18 +17,18 @@ void main(string[] args)
             
             Statements <- Statement (:WS? ":" :WS? Statement)*
 
-            Statement <- Const_stmt / Let_stmt / Print_stmt / If_stmt / Goto_stmt / Input_stmt / Gosub_stmt / Call_stmt /
-                        Rem_stmt / Poke_stmt / For_stmt / Next_stmt / Dim_stmt / Charat_stmt / Data_stmt / Textat_stmt / Incbin_stmt /
-                        Include_stmt / Load_stmt / Save_stmt / Randomize_stmt /
-                        Origin_stmt / Swap_stmt / Locate_stmt / On_stmt / Error_stmt / Wait_stmt /
-                         Memset_stmt / Memcpy_stmt / Memshift_stmt / Open_stmt / Close_stmt / Get_stmt /
-                        If_sa_stmt / Else_stmt / Endif_stmt / Fun_stmt / Endfun_stmt / Return_fn_stmt / Return_stmt / Exitfun_stmt / Do_stmt / Loop_stmt /
-                        Asm_stmt / Endasm_stmt / Print_hash_stmt / Write_stmt / Read_stmt /
-                        Cont_stmt /  Exit_do_stmt / Exit_for_stmt / Type_stmt / Endtype_stmt / Endselect_stmt / End_stmt /
-                        Screen_stmt / Option_stmt / Sprite_clearhit_stmt / Sprite_multicolor_stmt / Sprite_stmt /
-                        Sound_clear_stmt / Volume_stmt / Voice_stmt / Filter_stmt / Irq_stmt / Border_stmt / Background_stmt / Sys_stmt /
-                        Charset_stmt / Scroll_stmt / VMode_stmt / Field_def /
-                        Select_stmt / Case_stmt
+            Statement <- (Const_stmt | Let_stmt | Print_stmt | If_stmt | Goto_stmt | Input_stmt | Gosub_stmt | Call_stmt |
+                        Rem_stmt | Poke_stmt | For_stmt | Next_stmt | Dim_stmt | Charat_stmt | Data_stmt | Textat_stmt | Incbin_stmt |
+                        Include_stmt | Load_stmt | Save_stmt | Randomize_stmt |
+                        Origin_stmt | Swap_stmt | Locate_stmt | On_stmt | Error_stmt | Wait_stmt |
+                         Memset_stmt | Memcpy_stmt | Memshift_stmt | Open_stmt | Close_stmt | Get_stmt |
+                        If_sa_stmt | Else_stmt | Endif_stmt | Fun_stmt | Endfun_stmt | Return_fn_stmt | Return_stmt | Exitfun_stmt | Do_stmt | Loop_stmt |
+                        Asm_stmt | Endasm_stmt | Print_hash_stmt | Write_stmt | Read_stmt |
+                        Cont_stmt |  Exit_do_stmt | Exit_for_stmt | Type_stmt | Endtype_stmt | Endselect_stmt | End_stmt |
+                        Screen_stmt | Option_stmt | Sprite_clearhit_stmt | Sprite_multicolor_stmt | Sprite_stmt |
+                        Sound_clear_stmt | Volume_stmt | Voice_stmt | Filter_stmt | Irq_stmt | Border_stmt | Background_stmt | Sys_stmt |
+                        Charset_stmt | Scroll_stmt | VMode_stmt | Field_def |
+                        Select_stmt | Case_stmt)
             Const_stmt <-    ("shared"i :WS)? "const"i :WS? Var :WS? "=" :WS? Number
             Let_stmt <-      ("let"i / eps) :WS? Accessor :WS? "=" :WS? Expression
             Print_stmt <-    "print"i :WS? PrintableList :WS? ";"?
@@ -138,7 +138,7 @@ void main(string[] args)
                     FilterSubCmdResonance <- "resonance"i :WS Expression
                     FilterSubCmdPass <-  ("low"i / "band"i / "high"i) :WS "pass"i
 
-            Charset_stmt <- "charset"i :WS ("rom"i / "ram"i) :WS Expression
+            Charset_stmt <- "charset"i (:WS "rom"i / "ram"i)? :WS Expression
             Scroll_stmt <- ("h"i / "v"i) "scroll"i :WS Expression
             VMode_stmt <- "vmode"i (:WS VModeSubCmd)+
                 VModeSubCmd <- VModeSubCmdTextBitmap / VModeSubCmdColor /
@@ -148,8 +148,8 @@ void main(string[] args)
                     VModeSubCmdRsel <- "rows"i :WS Expression
                     VModeSubCmdCsel <- "cols"i :WS Expression
 
-            ExprList <- Expression :WS? ("," :WS? Expression)*
-            AccessorList <- Accessor :WS? ("," :WS? Accessor)*
+            ExprList <- Expression (:WS? "," :WS? Expression)*
+            AccessorList <- Accessor (:WS? "," :WS? Accessor)*
             PrintableList <- Expression :WS? (:WS? (TabSep / NlSupp) :WS? Expression)* NlSupp?
             TabSep <- ","
             NlSupp <- ";"
