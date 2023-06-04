@@ -23,7 +23,7 @@ void main(string[] args)
                         Origin_stmt | Swap_stmt | Locate_stmt | On_stmt | Error_stmt | Wait_stmt |
                          Memset_stmt | Memcpy_stmt | Memshift_stmt | Open_stmt | Close_stmt | Get_stmt |
                         If_sa_stmt | Else_stmt | Endif_stmt | Fun_stmt | Endfun_stmt | Return_fn_stmt | Return_stmt | Exitfun_stmt | Do_stmt | Loop_stmt |
-                        Asm_stmt | Endasm_stmt | Print_hash_stmt | Write_stmt | Read_stmt |
+                        Asm_stmt | Endasm_stmt | Write_stmt | Read_stmt |
                         Cont_stmt |  Exit_do_stmt | Exit_for_stmt | Type_stmt | Endtype_stmt | Endselect_stmt | End_stmt |
                         Screen_stmt | Option_stmt | Sprite_clearhit_stmt | Sprite_multicolor_stmt | Sprite_stmt |
                         Sound_clear_stmt | Volume_stmt | Voice_stmt | Filter_stmt | Irq_stmt | Border_stmt | Background_stmt | Sys_stmt |
@@ -31,8 +31,7 @@ void main(string[] args)
                         Select_stmt | Case_stmt)
             Const_stmt <-    ("shared"i :WS)? "const"i :WS? Var :WS? "=" :WS? Number
             Let_stmt <-      ("let"i / eps) :WS? Accessor :WS? "=" :WS? Expression
-            Print_stmt <-    "print"i :WS? PrintableList :WS? ";"?
-            Print_hash_stmt <- "print"i :WS? "#" :WS? ExprList :WS? ";"?
+            Print_stmt <-    "print"i :WS? ("#" :WS? Expression :WS? "," :WS?)? PrintableList :WS? ";"?
             Write_stmt      <- "write"i :WS? "#" :WS? ExprList
             Read_stmt       <- "read"i :WS? "#" :WS? Expression  :WS? "," :WS? AccessorList
             If_stmt <-       "if"i :WS Expression :WS "then"i :WS Statements (:WS? "else"i :WS Statements)?
@@ -42,12 +41,12 @@ void main(string[] args)
             Goto_stmt <-     "goto"i :WS (Label_ref / Unsigned)
             Error_stmt <-    "error"i :WS Expression
             Swap_stmt <-     "swap"i :WS Accessor :WS? "," :WS? Accessor
-            Input_stmt <-    "input"i :WS (("#" :WS? Expression :WS? ",")  / (String :WS? ";"))? :WS? Accessor :WS? ";"?
+            Input_stmt <-    "input"i :WS (("#" :WS? Expression :WS? ",")  / (String :WS? ";"))? :WS? AccessorList :WS? ";"?
             Gosub_stmt <-    "gosub"i :WS (Label_ref / Unsigned)
             Call_stmt <-     "call"i :WS Accessor
             Return_stmt <-   "return"i
             Return_fn_stmt <- "return"i :WS Expression
-            Poke_stmt <-     "poke"i :WS Expression :WS? "," :WS? Expression
+            Poke_stmt <-     ("poke"i / "doke"i) :WS Expression :WS? "," :WS? Expression
             Do_stmt <-       "do"i (:WS ("while"i / "until"i) :WS Expression)?
             Loop_stmt <-     "loop"i (:WS ("while"i / "until"i) :WS Expression)?
             Cont_stmt <-     "continue"i :WS ("for"i / "do"i)?
@@ -76,7 +75,7 @@ void main(string[] args)
             Save_stmt <-     "save"i :WS ExprList
             Origin_stmt <-   "origin"i :WS (Number / Label_ref)
             Locate_stmt <-   "locate"i :WS Expression :WS? "," :WS? Expression
-            On_stmt <-       "on"i :WS (Expression / "error"i / "timer"i / "sprite"i / "background"i / "raster"i) (:WS Expression)? :WS Branch_type :WS Label_ref (:WS? "," :WS? Label_ref)*
+            On_stmt <-       "on"i :WS (Expression / "error"i / "timer"i / "sprite"i / "background"i / "raster"i / "vblank"i) (:WS Expression)? :WS Branch_type :WS Label_ref (:WS? "," :WS? Label_ref)*
                 Branch_type <- "goto"i / "gosub"i
             Wait_stmt <-     "wait"i :WS? Expression :WS? "," :WS? Expression (:WS? "," :WS? Expression)?
             Memset_stmt <-   "memset"i :WS? ExprList
@@ -100,19 +99,22 @@ void main(string[] args)
                 Case_else_stmt <- "case else"i
             Endselect_stmt <- "end select"i
 
-            Irq_stmt <- ("timer"i / "raster"i / "sprite"i / "background"i / "system"i) :WS "interrupt"i :WS ("on"i / "off"i)
+            Irq_stmt <- ("timer"i / "raster"i / "sprite"i / "background"i / "system"i / "vblank"i) :WS "interrupt"i :WS ("on"i / "off"i)
             
             Sprite_stmt <-   "sprite"i :WS Expression (:WS SprSubCmd)*
                 SprSubCmd <-  SprSubCmdOnOff / SprSubCmdAt / SprSubCmdColor /
                              SprSubCmdHiresMulti / SprSubCmdOnUnderBg /
-                             SprSubCmdShape / SprSubCmdXYSize
+                             SprSubCmdShape / SprSubCmdXYSize / SprSubCmdZDepth / SprSubCmdZYFlip
                     SprSubCmdOnOff <- "on"i / "off"i
                     SprSubCmdAt <- "at"i :WS ExprList
                     SprSubCmdColor <- "color"i :WS Expression
-                    SprSubCmdHiresMulti <- "hires"i / "multi"i
+                    SprSubCmdHiresMulti <- "hires"i / "multi"i / "lowcol"i / "hicol"i
                     SprSubCmdOnUnderBg <- ("on"i | "under"i) :WS "background"i
+                    SprSubCmdZDepth < "zdepth"i :WS Expression
                     SprSubCmdShape <- "shape"i :WS Expression
                     SprSubCmdXYSize <- "xysize"i :WS ExprList
+                    SprSubCmdZYFlip <- "xyflip" :WS ExprList
+            Sprite_clear_stmt <- "sprite"i :WS "clear"i
             Sprite_clearhit_stmt <- "sprite"i :WS "clear"i :WS "hit"i
             Sprite_multicolor_stmt <- "sprite"i :WS "multicolor"i :WS ExprList
             
@@ -120,29 +122,31 @@ void main(string[] args)
             Background_stmt <-  "background"i :WS ExprList
 
             Sound_clear_stmt <- "sound"i :WS "clear"i
-            Volume_stmt <- "volume"i :WS Expression
-            Voice_stmt <- "voice"i :WS Number (:WS VoiceSubCmd)+
+            Volume_stmt <- "volume"i :WS ExprList
+            Voice_stmt <- "voice"i :WS Expression (:WS VoiceSubCmd)+
                 VoiceSubCmd <- VoiceSubCmdOnOff / VoiceSubCmdADSR /
                               VoiceSubCmdTone / VoiceSubCmdWave / VoiceSubCmdPulse /
-                              VoiceSubCmdFilterOnOff
-                    VoiceSubCmdOnOff <- "on"i / "off"i
+                              VoiceSubCmdFilterOnOff / VoiceSubCmdVolume
+                    VoiceSubCmdOnOff <- "on"i / "off"i / "left"i / "right"i
                     VoiceSubCmdADSR <- "adsr"i :WS ExprList
                     VoiceSubCmdTone <- "tone"i :WS Expression
                     VoiceSubCmdWave <- "wave"i :WS ("saw"i / "tri"i / "pulse"i / "noise"i )
                     VoiceSubCmdPulse <- "pulse"i :WS Expression
+                    VoiceSubCmdVolume <- "volume"i :WS Expression
                     VoiceSubCmdFilterOnOff <- "filter"i :WS ("on"i / "off"i)
-            Filter_stmt <- "filter"i (:WS FilterSubCmd)+
+            Filter_stmt <- "filter"i (:WS Number)? (:WS FilterSubCmd)+
                 FilterSubCmd <- FilterSubCmdCutoff / FilterSubCmdResonance /
                                 FilterSubCmdPass
                     FilterSubCmdCutoff <- "cutoff"i :WS Expression
                     FilterSubCmdResonance <- "resonance"i :WS Expression
                     FilterSubCmdPass <-  ("low"i / "band"i / "high"i) :WS "pass"i
 
-            Charset_stmt <- "charset"i (:WS "rom"i / "ram"i)? :WS Expression
-            Scroll_stmt <- ("h"i / "v"i) "scroll"i :WS Expression
+            Charset_stmt <- "charset"i (:WS ("rom"i / "ram"i))? :WS Expression
+            Scroll_stmt <- ("h"i / "v"i) "scroll"i :WS ExprList
             VMode_stmt <- "vmode"i (:WS VModeSubCmd)+
                 VModeSubCmd <- VModeSubCmdTextBitmap / VModeSubCmdColor /
-                                VModeSubCmdRsel / VModeSubCmdCsel
+                                VModeSubCmdRsel / VModeSubCmdCsel / VModeSubCmdExpression
+                    VModeSubCmdExpression <- Expression
                     VModeSubCmdTextBitmap <- "text"i / "bitmap"i / "ext"i
                     VModeSubCmdColor <- "hires"i / "multi"i
                     VModeSubCmdRsel <- "rows"i :WS Expression
@@ -200,7 +204,7 @@ void main(string[] args)
 
             Line_id <- (Label / Unsigned / eps)
 
-            Reserved <- "and"i / "as"i / "asm"i / "background"i / "border"i / "byte"i / "call"i / "case"i / "charat"i / "close"i / "const"i / "continue"i / "data"i / "decimal"i / "declare"i / "dim"i / "do"i / "else"i / "end"i / "error"i / "exit"i / "fast"i / "filter"i / "float"i / "for"i / "function"i / "get"i / "gosub"i / "goto"i / "hscroll"i / "if"i / "incbin"i / "include"i / "inline"i / "input"i / "int"i / "interrupt"i / "let"i / "load"i / "locate"i / "long"i / "loop"i / "memcpy"i / "memset"i / "memshift"i / "mod"i / "next"i / "not"i / "off"i / "on"i / "open"i / "option"i / "or"i / "origin"i / "overload"i / "poke"i / "print"i / "private"i / "randomize"i / "raster"i / "read"i / "rem"i / "return"i / "save"i / "screen"i / "select"i / "shared"i / "sound"i / "sprite"i / "static"i / "step"i / "string"i / "sub"i / "swap"i / "sys"i / "system"i / "textat"i / "then"i / "timer"i / "to"i / "type"i / "until"i / "vmode"i / "voice"i / "volume"i / "vscroll"i / "while"i / "word"i / "write"i / "xor"
+            Reserved <- "and"i / "as"i / "asm"i / "background"i / "border"i / "byte"i / "call"i / "case"i / "charat"i / "close"i / "const"i / "continue"i / "data"i / "decimal"i / "declare"i / "dim"i / "do"i / "doke"i / "else"i / "end"i / "error"i / "exit"i / "fast"i / "filter"i / "float"i / "for"i / "function"i / "get"i / "gosub"i / "goto"i / "hscroll"i / "if"i / "incbin"i / "include"i / "inline"i / "input"i / "int"i / "interrupt"i / "let"i / "load"i / "locate"i / "long"i / "loop"i / "memcpy"i / "memset"i / "memshift"i / "mod"i / "next"i / "not"i / "off"i / "on"i / "open"i / "option"i / "or"i / "origin"i / "overload"i / "poke"i / "print"i / "private"i / "randomize"i / "raster"i / "read"i / "rem"i / "return"i / "save"i / "screen"i / "select"i / "shared"i / "sound"i / "sprite"i / "static"i / "step"i / "string"i / "sub"i / "swap"i / "sys"i / "system"i / "textat"i / "then"i / "timer"i / "to"i / "type"i / "until"i / "vmode"i / "voice"i / "volume"i / "vscroll"i / "while"i / "word"i / "write"i / "xor"i / "vblank"i
             WS <- (space / "_" endOfLine+ / "'"  ~((!eol .)*))+
             EOI < !.
             Spacing <- :('\t')*
