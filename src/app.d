@@ -103,8 +103,9 @@ void main(string[] args)
             Irq_stmt <- ("timer"i / "raster"i / "sprite"i / "background"i / "system"i) :WS "interrupt"i :WS ("on"i / "off"i)
             
             Sprite_stmt <-   "sprite"i :WS Expression (:WS SprSubCmd)*
-                SprSubCmd <-  SprSubCmdOnOff / SprSubCmdAt / SprSubCmdColor /
-                             SprSubCmdHiresMulti / SprSubCmdOnUnderBg /
+                SprSubCmd <-  SprSubCmdOnUnderBg /SprSubCmdOnOff / 
+							SprSubCmdAt / SprSubCmdColor /
+                             SprSubCmdHiresMulti /
                              SprSubCmdShape / SprSubCmdXYSize
                     SprSubCmdOnOff <- "on"i / "off"i
                     SprSubCmdAt <- "at"i :WS ExprList
