@@ -203,11 +203,7 @@ void main(string[] args)
 
             Line_id <- (Label / Unsigned / eps)
 
-<<<<<<< HEAD
-            Reserved < "and"i / "as"i / "asm"i / "background"i / "border"i / "byte"i / "call"i / "case"i / "charat"i / "close"i / "const"i / "continue"i / "data"i / "decimal"i / "declare"i / "dim"i / "do"i / "else"i / "end"i / "error"i / "exit"i / "fast"i / "filter"i / "float"i / "for"i / "function"i / "get"i / "gosub"i / "goto"i / "hscroll"i / "if"i / "incbin"i / "include"i / "inline"i / "input"i / "int"i / "interrupt"i / "let"i / "load"i / "locate"i / "long"i / "loop"i / "memcpy"i / "memset"i / "memshift"i / "mod"i / "next"i / "not"i / "off"i / "on"i / "open"i / "option"i / "or"i / "origin"i / "overload"i / "poke"i / "print"i / "private"i / "randomize"i / "raster"i / "read"i / "rem"i / "return"i / "save"i / "screen"i / "select"i / "shared"i / "sound"i / "sprite"i / "static"i / "step"i / "string"i / "sub"i / "swap"i / "sys"i / "system"i / "textat"i / "then"i / "timer"i / "to"i / "type"i / "until"i / "vmode"i / "voice"i / "volume"i / "vscroll"i / "while"i / "word"i / "write"i / "xor"
-=======
             Reserved <- "and"i / "as"i / "asm"i / "background"i / "border"i / "byte"i / "call"i / "case"i / "charat"i / "close"i / "const"i / "continue"i / "data"i / "decimal"i / "declare"i / "dim"i / "do"i / "else"i / "end"i / "error"i / "exit"i / "fast"i / "filter"i / "float"i / "for"i / "function"i / "get"i / "gosub"i / "goto"i / "hscroll"i / "if"i / "incbin"i / "include"i / "inline"i / "input"i / "int"i / "interrupt"i / "let"i / "load"i / "locate"i / "long"i / "loop"i / "memcpy"i / "memset"i / "memshift"i / "mod"i / "next"i / "not"i / "off"i / "on"i / "open"i / "option"i / "or"i / "origin"i / "overload"i / "poke"i / "doke"i / "print"i / "private"i / "randomize"i / "raster"i / "read"i / "rem"i / "return"i / "save"i / "screen"i / "select"i / "shared"i / "sound"i / "sprite"i / "static"i / "step"i / "string"i / "sub"i / "swap"i / "sys"i / "system"i / "textat"i / "then"i / "timer"i / "to"i / "type"i / "until"i / "vmode"i / "voice"i / "volume"i / "vscroll"i / "while"i / "word"i / "write"i / "xor"
->>>>>>> 20e0350 (Added missing DOKE keyword)
             WS <- (space / "_" endOfLine+ / "'"  ~((!eol .)*))+
             EOI < !.
             Spacing <- :('\t')*
