@@ -154,7 +154,7 @@ void main(string[] args)
             TabSep <- ","
             NlSupp <- ";"
             VarList <- Var (:WS? "," :WS? Var)*
-            Datalist <- (Number / String / Label_ref) (:WS? "," :WS? (Number / String / Label_ref) :WS?)*
+            Datalist <- (Number / String / Label_deref / Varname) (:WS? "," :WS? (Number / String / Label_deref / Varname) :WS?)*
 
             Expression <- Relation (:WS? BW_OP :WS? Relation)*
             Relation <- Simplexp (:WS? REL_OP :WS? Simplexp)?
@@ -200,6 +200,7 @@ void main(string[] args)
 
             Label <- [a-zA-Z_] [a-zA-Z_0-9]* ":"
             Label_ref <- [a-zA-Z_] [a-zA-Z_0-9]*
+            Label_deref <- "@" Label_ref
 
             Line_id <- (Label / Unsigned / eps)
 
